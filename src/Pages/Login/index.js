@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Animatable from 'react-native-animatable'
 import { useNavigation} from '@react-navigation/native'
 import { Ionicons } from '@expo/vector-icons';
-import { useFonts, Roboto_700Bold_Italic,Roboto_700Bold } from '@expo-google-fonts/roboto';
+import { useFonts, Roboto_700Bold_Italic,Roboto_700Bold,Roboto_100Thin } from '@expo-google-fonts/roboto';
 
 export default function Login() {
     const navigation = useNavigation();
@@ -17,10 +17,11 @@ export default function Login() {
     }
     let [fontsLoaded] = useFonts({
         Roboto_700Bold_Italic,
-        Roboto_700Bold
-      });
+        Roboto_700Bold,
+        Roboto_100Thin
+    });
     
-      if (!fontsLoaded) {
+    if (!fontsLoaded) {
         return null;
     }
     const handelLogin = () =>{

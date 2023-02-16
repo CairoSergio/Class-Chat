@@ -14,13 +14,7 @@ const styles = StyleSheet.create({
 });
 
 export default function Stettings() {
-  //   let [fontsLoaded] = useFonts({
-  //     Roboto_700Bold,
-  //   });
 
-  //   if (!fontsLoaded) {
-  //     return <AppLoading />;
-  //   }
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Stettings!</Text>

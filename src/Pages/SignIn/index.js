@@ -28,7 +28,6 @@ export default function SignIn() {
   }
 
 
-  <Load/>
   return (
     <View style={styles.container}>
       <View style={styles.titlecontainer}>

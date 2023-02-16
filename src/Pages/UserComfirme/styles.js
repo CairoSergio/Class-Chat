@@ -1,16 +1,15 @@
 import { StyleSheet } from "react-native";
-import { useFonts, Roboto_700Bold } from '@expo-google-fonts/roboto';
+import { useFonts, Roboto_700Bold,Roboto_300Light } from '@expo-google-fonts/roboto';
 export default function Load (){
-    let [fontsLoaded] = useFonts({
-      Roboto_700Bold,
-      Roboto_100Thin,
-      Roboto_900Black,
-    });
-    
-    if (!fontsLoaded) {
-      return <AppLoading />;
-    }
+  let [fontsLoaded] = useFonts({
+    Roboto_700Bold,
+    Roboto_300Light
+  });
+  
+  if (!fontsLoaded) {
+    return;
   }
+}
 export  const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -64,7 +63,7 @@ export  const styles = StyleSheet.create({
       height:50,
       backgroundColor:'#007fff',
       borderRadius:7,
-      marginTop:20,
+      marginTop:10,
       alignItems:'center',
       justifyContent:'center'
     },
@@ -81,5 +80,22 @@ export  const styles = StyleSheet.create({
       zIndex:1000,
       top:-200,
       maxHeight:110
+    },
+    data:{
+      width:'90%',
+      height:50,
+      borderRadius:7,
+      justifyContent:'center',
+      alignItems:'center',
+      borderWidth:1,
+      marginTop:10,
+    },
+    datatext:{
+      fontSize:20,
+    },
+    datacalendar:{
+      position:'absolute',
+      right:10,
+      top:10
     }
   });

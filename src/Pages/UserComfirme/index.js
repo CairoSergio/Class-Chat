@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Image, View, TouchableOpacity, Text, TextInput, ScrollView, FlatList, Modal, StatusBar } from 'react-native';
+import { Image, View, TouchableOpacity, Text, TextInput, ScrollView, FlatList, Modal, StatusBar, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { styles } from './styles';
 import { Ionicons } from "@expo/vector-icons";
 import Cidades from 'country-json/src/country-by-capital-city.json';
 import {Calendar} from 'react-native-calendars';
-
+import { useFonts, Roboto_700Bold,Roboto_100Thin,Roboto_900Black } from '@expo-google-fonts/roboto';
 export default function UserConfirme() {
   const [image, setImage] = useState(null);
   const [ userNome, setUserNome]= useState('')
@@ -15,6 +15,13 @@ export default function UserConfirme() {
   const [ list, setList ] = useState(false)
   const [ modal, setModal]= useState(false)
   const cidades = [...Cidades]
+  const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+  const day = new Date().getDate().toString().padStart(2, '0');
+  const month = months[new Date().getMonth()];
+  const year = new Date().getFullYear().toString();
+  const [ data, setData] = useState(`${day}  /  ${month}  /  ${year}`)
+
+  // const formattedDate = `${day}   /   ${month}   /   ${year}`;
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -32,15 +39,13 @@ export default function UserConfirme() {
 
   function Handlecreate(){
     for (var i = 0; i < cidades.length; i++){
-      let cidade = `${cidades[i].city.toLowerCase()}, ${cidades[i].country.toLowerCase()}`
-      // console.log(cidade,userCity.toLowerCase())
-      if (cidade.includes(userCity.toLowerCase())){
-        alert("certo");
+      let  cidade = `${cidades[i].city.toLowerCase()}, ${cidades[i].country.toLowerCase()}`
+      if (cidade===userCity.toLowerCase()){
+        alert("certo")
         return;
-      }
-      alert("A sua localização não esta disponivel na nossa lista de localizações permitidas, experimente a capital do seu pais");
-
+      }  
     }
+    alert("A sua localização não esta disponivel na nossa lista de localizações permitidas, experimente a capital do seu pais")
   }
   const [filteredData, setFilteredData] = useState(cidades);
 
@@ -48,9 +53,10 @@ export default function UserConfirme() {
     setUserCity(searchText);
     setFilteredData(
       cidades.filter(
-        (item) => {
-         item.country.toLowerCase().indexOf(searchText.toLowerCase()) > -1
-        }
+        (item) => 
+        // removendo todos os caracters especiais para que a pesquisa seja feita mesmo sem usa-los
+          item.city.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
+          item.country.toLowerCase().indexOf(searchText.toLowerCase()) > -1
       )
     );
     if(searchText){
@@ -68,17 +74,24 @@ export default function UserConfirme() {
     }
     setcityList(item.city)
     setcoutryList(item.country)
+
     if(userCity){
-      return(
+      return (
         <TouchableOpacity style={{height:40}} onPress={HandleCity}>
           <Text>{citylist}, {coutrylist}</Text>
         </TouchableOpacity>
-      )
-
-    }else{
+      );
+    } else {
       setcityList('')
       setcoutryList('')
+      return null; // return null if userCity is not set
     }
+  }
+  const handleDayPress = (day) => {
+    const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    const { year, month, day: selectedDay } = day;
+    setData(`${selectedDay}  /  ${meses[month-1]}  /  ${year}`);
+    setModal(false)
   }
   return (
     <View style={styles.container}>
@@ -92,7 +105,7 @@ export default function UserConfirme() {
             <Ionicons name="person-circle-outline" size={110} color="#ccc" />
           )}
           <View style={{position:"absolute", backgroundColor:'#fff',borderRadius:20,bottom:4, right:-4}}>
-            <Ionicons name='add-circle' color='#007fff' size={34}/>
+            <Ionicons name='add-circle' color='#009fff' size={34}/>
           </View>
         </TouchableOpacity>
         <Text style={styles.perfiltext} >Foto de perfil</Text>
@@ -114,28 +127,29 @@ export default function UserConfirme() {
             onChangeText={handleSearch}
           />
         </View>
-        <View animation={'fadeInLeft'} delay={1500} style={{width:'100%', justifyContent:'center', alignItems:'center'}}>
+        <View style={{width:'100%', justifyContent:'center', alignItems:'center'}}>
+          <TouchableOpacity onPress={()=>setModal(true)} style={styles.data}>
+            <Text style={styles.datatext}>{data}</Text>
+            <Ionicons name='calendar' size={25} style={styles.datacalendar} color='#009fff'/>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.login} onPress={Handlecreate}>
               <Text style={styles.logintext}>CRIAR CONTA</Text>
           </TouchableOpacity>
           {
             list && 
               <View style={styles.FlatList}>
-                <ScrollView style={{width:'90%', backgroundColor:'#fff',elevation:5, borderRadius:5, padding:10}}>
-                  <FlatList
-                    initialNumToRender={20}
-                    data={filteredData}
-                    renderItem={handleverify}
-                    keyExtractor={(item,index) => index}
-                  />
-                </ScrollView>
+                <FlatList style={{width:'90%', backgroundColor:'#fff',elevation:5, borderRadius:5, padding:10}}
+                  initialNumToRender={20}
+                  data={filteredData}
+                  renderItem={handleverify}
+                  keyExtractor={(item,index) => index}
+                />
               </View>
           }
-          <TouchableOpacity onPress={()=>setModal(true)} style={styles.login}>
-            <Text style={styles.logintext}>Calendario</Text>
-          </TouchableOpacity>
           <Modal visible={modal}>
-            <Calendar/>
+            <Calendar
+              onDayPress={handleDayPress}
+            />
           </Modal>
         </View>
       </View>
