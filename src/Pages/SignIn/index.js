@@ -53,17 +53,17 @@ export default function SignIn() {
           <Text style={styles.inputtext}>Telefone</Text>
           <TextInput placeholder='Insira o seu numero de telefone' 
               style={ styles.input}
-              value={userNome}
-              onChangeText={setUserNome}
+              value={userTelefone}
+              onChangeText={setUserTelefone}
           />
         </Animatable.View>
         <Animatable.View  animation={'fadeInLeft'} delay={750}  style={styles.InputBox}>
           <Text style={styles.inputtext}>Senha</Text>
           <TextInput placeholder='Insira o seu numero' 
               style={ styles.input}
-              value={userTelefone}
+              value={userSenha}
               secureTextEntry={true}
-              onChangeText={setUserTelefone}
+              onChangeText={setUserSenha}
           />
         </Animatable.View>
         <Animatable.View  animation={'fadeInLeft'} delay={1000}  style={styles.InputBox}>
@@ -76,7 +76,7 @@ export default function SignIn() {
           />
         </Animatable.View>
         <Animatable.View animation={'fadeInLeft'} delay={1500}>
-          <TouchableOpacity style={styles.login} onPress={()=> navigation.navigate('UserComfirme')}>
+          <TouchableOpacity style={styles.login} onPress={()=> navigation.navigate('UserComfirme',{Userinfo:{Email: userEmail, telefone: userTelefone, senha:userSenha}})}>
               <Text style={styles.logintext}>CADASTRAR</Text>
           </TouchableOpacity>
         </Animatable.View>

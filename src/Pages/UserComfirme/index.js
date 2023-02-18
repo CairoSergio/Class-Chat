@@ -5,8 +5,11 @@ import { styles } from './styles';
 import { Ionicons } from "@expo/vector-icons";
 import Cidades from 'country-json/src/country-by-capital-city.json';
 import {Calendar} from 'react-native-calendars';
+import { useRoute } from '@react-navigation/native'
+
 import { useFonts, Roboto_700Bold,Roboto_100Thin,Roboto_900Black } from '@expo-google-fonts/roboto';
-export default function UserConfirme() {
+export default function UserConfirme({route}) {
+  const [ userApelido, setUserApelido ] = useState('')
   const [image, setImage] = useState(null);
   const [ userNome, setUserNome]= useState('')
   const [ userCity, setUserCity]= useState('')
@@ -19,7 +22,7 @@ export default function UserConfirme() {
   const day = new Date().getDate().toString().padStart(2, '0');
   const month = months[new Date().getMonth()];
   const year = new Date().getFullYear().toString();
-  const [ data, setData] = useState(`${day}  /  ${month}  /  ${year}`)
+  const [ data, setData] = useState(`${day} / ${month} / ${year}`)
 
   // const formattedDate = `${day}   /   ${month}   /   ${year}`;
   const pickImage = async () => {
@@ -38,14 +41,21 @@ export default function UserConfirme() {
   };
 
   function Handlecreate(){
-    for (var i = 0; i < cidades.length; i++){
-      let  cidade = `${cidades[i].city.toLowerCase()}, ${cidades[i].country.toLowerCase()}`
-      if (cidade===userCity.toLowerCase()){
-        alert("certo")
-        return;
-      }  
+    if(userCity===''|| userNome==='' || userApelido===''){
+      alert('Todos os campos sao de caracter obrigatorio')
+    }else{
+      for (var i = 0; i < cidades.length; i++){
+        let  cidade = `${cidades[i].city.toLowerCase()}, ${cidades[i].country.toLowerCase()}`
+        if (cidade===userCity.toLowerCase()){
+          alert("Conta criada com sucesso")
+          console.log('telefone',route.params.Userinfo.telefone,'Email:', route.params.Userinfo.Email)
+          console.log(`Nome:${userNome}, Apelido:${userApelido}, Cidade:${userCity}, Data de nascimento: ${data}`)
+          return;
+        }  
+      }
+      alert("A sua localização não esta disponivel na nossa lista de localizações permitidas, experimente a capital do seu pais")
+
     }
-    alert("A sua localização não esta disponivel na nossa lista de localizações permitidas, experimente a capital do seu pais")
   }
   const [filteredData, setFilteredData] = useState(cidades);
 
@@ -90,7 +100,7 @@ export default function UserConfirme() {
   const handleDayPress = (day) => {
     const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
     const { year, month, day: selectedDay } = day;
-    setData(`${selectedDay}  /  ${meses[month-1]}  /  ${year}`);
+    setData(`${selectedDay} / ${meses[month-1]} / ${year}`);
     setModal(false)
   }
   return (
@@ -112,11 +122,19 @@ export default function UserConfirme() {
       </View>
       <View style={styles.inputcontainer}>
         <View  animation={'fadeInLeft'} delay={500}  style={styles.InputBox}>
-          <Text style={styles.inputtext}>Nome de usuario</Text>
+          <Text style={styles.inputtext}>Nome</Text>
           <TextInput placeholder='Insira o seu nome' 
             style={ styles.input}
             value={userNome}
             onChangeText={setUserNome}
+          />
+        </View>
+        <View  animation={'fadeInLeft'} delay={500}  style={styles.InputBox}>
+          <Text style={styles.inputtext}>Apelido</Text>
+          <TextInput placeholder='Insira o seu nome' 
+            style={ styles.input}
+            value={userApelido}
+            onChangeText={setUserApelido}
           />
         </View>
         <View  animation={'fadeInLeft'} delay={500}  style={styles.InputBox}>
@@ -128,10 +146,14 @@ export default function UserConfirme() {
           />
         </View>
         <View style={{width:'100%', justifyContent:'center', alignItems:'center'}}>
-          <TouchableOpacity onPress={()=>setModal(true)} style={styles.data}>
-            <Text style={styles.datatext}>{data}</Text>
-            <Ionicons name='calendar' size={25} style={styles.datacalendar} color='#009fff'/>
-          </TouchableOpacity>
+          <View style={styles.InputBox}>
+            <Text style={styles.inputtext}>Data de nascimento</Text>
+            <TouchableOpacity onPress={()=>setModal(true)} style={styles.data}>
+              <Text style={styles.datatext}>{data}</Text>
+              <Ionicons name='calendar' size={25} style={styles.datacalendar} color='#009fff'/>
+            </TouchableOpacity>
+
+          </View>
           <TouchableOpacity style={styles.login} onPress={Handlecreate}>
               <Text style={styles.logintext}>CRIAR CONTA</Text>
           </TouchableOpacity>

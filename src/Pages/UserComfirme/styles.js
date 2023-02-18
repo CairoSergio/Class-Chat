@@ -20,7 +20,6 @@ export  const styles = StyleSheet.create({
       fontFamily: 'Roboto_700Bold',
     },
     perfil:{
-      marginTop:5,
       height:130,
       width:130,
       borderRadius:75,
@@ -33,7 +32,7 @@ export  const styles = StyleSheet.create({
     perfiltext:{
       fontFamily:"Roboto_700Bold",
       fontSize:20,
-      marginTop:10,
+      marginTop:5,
     },
     InputBox:{
       height:80,
@@ -63,7 +62,7 @@ export  const styles = StyleSheet.create({
       height:50,
       backgroundColor:'#007fff',
       borderRadius:7,
-      marginTop:10,
+      marginTop:'2%',
       alignItems:'center',
       justifyContent:'center'
     },
@@ -82,13 +81,12 @@ export  const styles = StyleSheet.create({
       maxHeight:110
     },
     data:{
-      width:'90%',
+      width:'100%',
       height:50,
       borderRadius:7,
       justifyContent:'center',
       alignItems:'center',
-      borderWidth:1,
-      marginTop:10,
+      borderWidth:2,
     },
     datatext:{
       fontSize:20,

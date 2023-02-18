@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import {Text, View, StatusBar, TextInput, TouchableOpacity } from 'react-native';
+import {Text, View, StatusBar, TextInput, TouchableOpacity,ActivityIndicator } from 'react-native';
 import { styles } from './styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Animatable from 'react-native-animatable'
 import { useNavigation} from '@react-navigation/native'
 import { Ionicons } from '@expo/vector-icons';
 import { useFonts, Roboto_700Bold_Italic,Roboto_700Bold,Roboto_100Thin } from '@expo-google-fonts/roboto';
-
-export default function Login() {
+export default function Login({onLoginSuccess}) {
+    
     const navigation = useNavigation();
+    const [loading, setLoading] = useState(false);
     const [ userEmail, setUserEmail] = useState('')
     const [ userSenha, setUserSenha] = useState('')
     const [eye, setEye]= useState(true)
@@ -26,10 +27,12 @@ export default function Login() {
     }
     const handelLogin = () =>{
         // AsyncStorage.getItem('ChatClass').then((value)=>{
-        //     const Values = JSON.parse(value)
-        //     console.log(Values[1].id)
+        //     // const Values = JSON.parse(value)
+        //     console.log(value)
         // })
-
+        // AsyncStorage.removeItem('ChatClass').then(()=>{
+        //     console.log('chave apagada')
+        // })
         // let Values = [
         //     {
         //         email: userEmail,
@@ -37,8 +40,11 @@ export default function Login() {
         //     }
         // ]
         // Values.push({id:1})
-        // AsyncStorage.setItem('ChatClass',JSON.stringify(Values));
-        alert('salvos')
+        setLoading(true);
+        AsyncStorage.setItem('ChatClass','2').then(()=>{
+            onLoginSuccess();
+        })
+        // alert('salvos')
     }
 
     return (
@@ -87,7 +93,11 @@ export default function Login() {
                     </TouchableOpacity>
                 </View>
                 <TouchableOpacity style={styles.login} onPress={handelLogin}>
-                    <Text style={styles.logintext}>LOGIN</Text>
+                    {loading ? (
+                        <ActivityIndicator color="#fff" size={26}/>
+                    ) : (
+                        <Text style={styles.logintext}>LOGIN</Text>
+                    )}
                 </TouchableOpacity>
                 <View style={[styles.pass, { top:'13%'} ]}>
                     <TouchableOpacity

@@ -7,15 +7,14 @@ import { NavigationContainer } from "@react-navigation/native"
 
 const Stack = createNativeStackNavigator();
 
-export default function LoginRoutes(){
+export default function LoginRoutes({onLoginSuccess}){
     return(
-        
         <Stack.Navigator>
-            <Stack.Screen 
+            <Stack.Screen
                 name="Login" 
-                component={Login} 
-                options={{headerShown:false}}
-            />
+                options={{headerShown:false}}>
+                {(props) => <Login {...props} onLoginSuccess={onLoginSuccess} />}
+            </Stack.Screen>
             <Stack.Screen 
                 name="SignIn" 
                 component={SignIn} 
