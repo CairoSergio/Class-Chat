@@ -22,9 +22,9 @@ export default function LoginRoutes({onLoginSuccess}){
             />
             <Stack.Screen 
                 name="UserComfirme" 
-                component={UserConfirme} 
-                options={{headerShown:false}}
-            />
+                options={{headerShown:false}}>
+                {(props) => <UserConfirme {...props} onLoginSuccess={onLoginSuccess} />}
+            </Stack.Screen>
         </Stack.Navigator>
     )
 }

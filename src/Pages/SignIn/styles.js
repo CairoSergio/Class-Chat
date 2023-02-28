@@ -16,11 +16,12 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    marginTop:30
+    backgroundColor:'#fff'
   },
   titlecontainer:{
     flex:1,
-    alignItems:'center'
+    alignItems:'center',
+    marginTop:30,
   },
   title:{
     display:'flex',
@@ -76,6 +77,19 @@ export const styles = StyleSheet.create({
     color:'#fff',
     fontFamily:'Roboto_700Bold',
     fontSize:18
+  },
+  eyes:{
+    backgroundColor:'#fff',
+    borderRadius:10,
+    position:'absolute',
+    zIndex:100,
+    bottom:2,
+    height:45,
+    width:40,
+    alignItems:'center',
+    justifyContent:'center',
+    right:3,
+  
   }
   
 });

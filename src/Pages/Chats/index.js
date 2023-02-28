@@ -1,6 +1,7 @@
 import React from 'react';
-import { StyleSheet, Text, View, Platform, Linking, AppLoading } from 'react-native';
+import { StyleSheet, Text, View, Platform, Linking, AppLoading, StatusBar } from 'react-native';
 import { useFonts, Roboto_700Bold } from '@expo-google-fonts/roboto';
+import ExpoStatusBar from 'expo-status-bar/build/ExpoStatusBar';
 
 const styles = StyleSheet.create({
   container: {
