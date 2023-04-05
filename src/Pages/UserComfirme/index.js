@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Image, View, TouchableOpacity, Text, TextInput, ScrollView, FlatList, Modal, StatusBar, Alert } from 'react-native';
+import { Image, View, TouchableOpacity, Text, TextInput, ScrollView, FlatList, Modal, StatusBar, Alert, ActivityIndicator } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { styles } from './styles';
 import { Ionicons } from "@expo/vector-icons";
 import Cidades from '../../Cidades.json';
-import {Calendar} from 'react-native-calendars';
-import { useRoute } from '@react-navigation/native'
-import { useFonts, Roboto_700Bold,Roboto_100Thin,Roboto_900Black } from '@expo-google-fonts/roboto';
-import axios, { Axios } from 'axios';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import axios from 'axios';
+import firebase from '../../../Api/Config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as FileSystem from 'expo-file-system';
-import Porta from '../../../Api/Porta.json'
+import Porta from '../../../Api/Porta.json';
+
 export default function UserConfirme({route,onLoginSuccess}) {
   const [ userApelido, setUserApelido ] = useState('')
   const [image, setImage] = useState(null);
@@ -20,15 +19,12 @@ export default function UserConfirme({route,onLoginSuccess}) {
   const [ coutrylist, setcoutryList]= useState('')
   const [ list, setList ] = useState(false)
   const [ modal, setModal]= useState(false)
+  const [ loading, setLoading] = useState(false)
+  const [ currentid, setCurrentid] = useState('')
   const cidades = [...Cidades]
   const Portaatual = [...Porta]
-  const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-  const day = new Date().getDate().toString().padStart(2, '0');
-  const month = months[new Date().getMonth()];
-  const year = new Date().getFullYear().toString();
-  const [ data, setData] = useState(`${day} / ${month} / ${year}`)
+  const [ data, setData] = useState(new Date())
 
-  // const formattedDate = `${day}   /   ${month}   /   ${year}`;
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -38,61 +34,66 @@ export default function UserConfirme({route,onLoginSuccess}) {
       quality: 1,
     });
 
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-    }
+    setImage(result.assets[0].uri);
   };
-
+  const uploadimage = async (identidade)=>{
+    console.log('started')
+    const response =  await fetch(image)
+    const blob = await response.blob()
+    const filename = `${identidade}.perfil`;
+    const ref = firebase.storage().ref().child(filename);
+    const snapshot = await ref.put(blob);
+    const url = await snapshot.ref.getDownloadURL();
+    console.log('use esse link para baixar',url);
+    alert('Conta criada com sucesso.');
+    await AsyncStorage.setItem('Imagem',url)
+    await AsyncStorage.setItem('ChatClass', identidade.toString()).then(()=>{
+      onLoginSuccess();
+    })
+    setLoading(false)
+  }
   async function Handlecreate() {
-    if (userCity === '' || userNome === '' || userApelido === '') {
-      alert('Todos os campos são obrigatórios.');
-    } else {
-      for (const cidade of cidades) {
-        if (`${cidade.city.toLowerCase()}, ${cidade.country.toLowerCase()}` === userCity.toLowerCase()) {
-          try {
-            const response = await axios.post(`${Portaatual[0].porta}/userprivateinfo`,{
-              Email: route.params.Userinfo.Email,
-              Telefone: route.params.Userinfo.Telefone,
-              Senha: route.params.Userinfo.Senha,
-              Code: route.params.Userinfo.Code,
-            });
-            const identidae = await axios.post(`${Portaatual[0].porta}/getid`,{
-              Email: route.params.Userinfo.Email,
-              Code: route.params.Userinfo.Code,
-            })
-            const id = identidae.data[0].id;
-            const imbasse64 = await FileSystem.readAsStringAsync(image, {
-              encoding: FileSystem.EncodingType.Base64,
-            });
-            
-            
-            const imageBuffer = Buffer.from(imbasse64, 'base64');
-            console.log('111')
-            
-            await axios.post(`${Portaatual[0].porta}/userinfo`, {
-              id_pessoa: id.toString(),
-              NomeDeUsuario:`${userNome} ${userApelido}`,
-              Cidade: userCity,
-              imagem: imageBuffer,
-              DataDeNascimento: data,
-            }, {
-              responseType: 'arraybuffer'
-            });
-            
-            alert('Conta criada com sucesso.');
-            AsyncStorage.setItem('ChatClass', id.toString()).then(()=>{
-              onLoginSuccess();
-            })
-            return;
-          } catch (error){
-            console.log(error),
-            alert('Erro ao criar a conta.');
-            return;
-            
+    setLoading(true)
+    if(loading){
+      return;
+    }else{
+      if (userCity === '' || userNome === '' || userApelido === '') {
+        alert('Todos os campos são obrigatórios.');
+        setLoading(false)
+      } else {
+        for (const cidade of cidades) {
+          if (`${cidade.city.toLowerCase()}, ${cidade.country.toLowerCase()}` === userCity.toLowerCase()) {
+            try {
+              const response = await axios.post(`${Portaatual[0].porta}/userprivateinfo`,{
+                Email: route.params.Userinfo.Email,
+                Telefone: route.params.Userinfo.Telefone,
+                Senha: route.params.Userinfo.Senha,
+                Code: route.params.Userinfo.Code,
+              });
+              const identidae = await axios.post(`${Portaatual[0].porta}/getid`,{
+                Email: route.params.Userinfo.Email,
+                Code: route.params.Userinfo.Code,
+              })
+              const id = identidae.data[0].id;
+              await axios.post(`${Portaatual[0].porta}/userinfo`, {
+                id_pessoa: id.toString(),
+                NomeDeUsuario:`${userNome} ${userApelido}`,
+                Cidade: userCity,
+                DataDeNascimento: data,
+              });
+              await uploadimage(id)
+              return;
+            } catch (error){
+              console.log(error),
+              alert('Erro ao criar a conta.');
+              setLoading(false)
+              return;
+              
+            }
           }
         }
+        alert('Sua localização não está disponível na nossa lista de localizações permitidas. Tente a capital do seu país.');
       }
-      alert('Sua localização não está disponível na nossa lista de localizações permitidas. Tente a capital do seu país.');
     }
   }
   
@@ -136,14 +137,20 @@ export default function UserConfirme({route,onLoginSuccess}) {
       return null; // return null if userCity is not set
     }
   }
-  const handleDayPress = (day) => {
-    const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-    const { year, month, day: selectedDay } = day;
-    setData(`${selectedDay} / ${meses[month-1]} / ${year}`);
+  const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+  const handleDayPress = (event, selectedDay) => {
+    const current = selectedDay || data;
+    // const { year, month, day: selectedDay } = day;
+    setData(current);
     setModal(false)
   }
   return (
     <View style={styles.container}>
+      <Modal transparent={true} visible={loading}>
+        <View style={{flex:1, backgroundColor:'rgba(0,0,0,0.50)', width:'100%', justifyContent:'center', alignItems:'center'}}>
+          <ActivityIndicator size={35} color='#007fff'/>
+        </View>
+      </Modal>
       <View>
         <TouchableOpacity style={styles.perfil} onPress={pickImage}>
           {image ? (
@@ -188,13 +195,13 @@ export default function UserConfirme({route,onLoginSuccess}) {
           <View style={styles.InputBox}>
             <Text style={styles.inputtext}>Data de nascimento</Text>
             <TouchableOpacity onPress={()=>setModal(true)} style={styles.data}>
-              <Text style={styles.datatext}>{data}</Text>
+              <Text style={styles.datatext}>{data.getDate()} / {meses[data.getMonth()]} / {data.getFullYear()}</Text>
               <Ionicons name='calendar' size={25} style={styles.datacalendar} color='#009fff'/>
             </TouchableOpacity>
 
           </View>
           <TouchableOpacity style={styles.login} onPress={Handlecreate}>
-              <Text style={styles.logintext}>CRIAR CONTA</Text>
+            <Text style={styles.logintext}>CRIAR CONTA</Text>
           </TouchableOpacity>
           {
             list && 
@@ -208,9 +215,13 @@ export default function UserConfirme({route,onLoginSuccess}) {
               </View>
           }
           <Modal visible={modal}>
-            <Calendar
-              onDayPress={handleDayPress}
-            />
+            <DateTimePicker
+              testID="dateTimePicker"
+              value={data}
+              mode='date'
+              is24Hour={true}
+              onChange={handleDayPress}
+            /> 
           </Modal>
         </View>
       </View>

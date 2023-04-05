@@ -1,4 +1,3 @@
-import { AppLoading } from 'react-native'
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -18,13 +17,13 @@ export const styles = StyleSheet.create({
     flexDirection:'row'
   },
   text: {
-    fontFamily: 'Roboto_700Bold',
+    fontFamily: 'roboto-bold',
     fontSize:40
   },
   Login:{
     marginTop:30,
     fontSize:25,
-    fontFamily:'Roboto_700Bold',
+    fontFamily:'roboto-bold',
   },
   InputContainer:{
     width:'90%',
@@ -46,7 +45,7 @@ export const styles = StyleSheet.create({
   },
   inputtext:{
     fontSize:18,
-    fontFamily:'Roboto_700Bold',
+    fontFamily:'roboto-bold',
     marginBottom:5
   },
   pass:{
@@ -66,7 +65,7 @@ export const styles = StyleSheet.create({
   },
   logintext:{
     color:'#fff',
-    fontFamily:'Roboto_700Bold',
+    fontFamily:'roboto-bold',
     fontSize:18
   },
   eyes:{

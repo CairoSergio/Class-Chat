@@ -1,15 +1,57 @@
 import {db} from "../db.js"
 import fs from 'fs'
 export const getUsers = (_, res) =>{
-    const q = "SELECT * FROM userinfo"
+  const q = "SELECT * FROM userprivateinfo"
 
 
 
-    db.query(q, (err, data)=>{
-        if(err) return res.json(err);
+  db.query(q, (err, data)=>{
+      if(err) return res.json(err);
 
-        return res.status(200).json(data)
-    })
+      return res.status(200).json(data)
+  })
+}
+export const getallusers = (req, res) =>{
+  const q = "SELECT * FROM userinfo WHERE id_pessoa != ?"
+  db.query(q, req.params.id,(err, data)=>{
+      if(err) return res.json(err);
+
+      return res.status(200).json(data)
+  })
+}
+export const getallFilteredusers = (req, res) =>{
+  const q = 
+  "SELECT * FROM userinfo WHERE id_pessoa != ? AND id_pessoa NOT IN (SELECT Remitente FROM pedidos WHERE Receptor = ? UNION SELECT Receptor FROM pedidos WHERE Remitente = ?)"
+  db.query(q, [req.params.id, req.params.id, req.params.id], (err, data)=>{
+      if(err) return res.json(err);
+
+      return res.status(200).json(data)
+  })
+}
+
+export const getUserEnviado = (req, res) =>{
+  const q = "SELECT * FROM userinfo WHERE id_pessoa = ?"
+  db.query(q, req.params.id,(err, data)=>{
+      if(err) return res.json(err);
+
+      return res.status(200).json(data)
+  })
+}
+export const getEnviados = (req, res) =>{
+  const q = "SELECT Receptor FROM pedidos WHERE Remitente = ?"
+  db.query(q, req.params.id,(err, data)=>{
+      if(err) return res.json(err);
+
+      return res.status(200).json(data)
+  })
+}
+export const getRecebidos = (req, res) =>{
+  const q = "SELECT Remitente FROM pedidos WHERE Receptor = ?"
+  db.query(q, req.params.id,(err, data)=>{
+      if(err) return res.json(err);
+
+      return res.status(200).json(data)
+  })
 }
 export const verify = (req, res) =>{
   const q = "SELECT * FROM userprivateinfo WHERE Email = ? AND Senha = ?";
@@ -25,19 +67,6 @@ export const verify = (req, res) =>{
       return res.status(200).json(data)
   })
 }
-export const getPerfil = (req, res) => {
-  const id = req.params.id;
-  const query = 'SELECT Perfil FROM userinfo WHERE id_pessoa = ?';
-  db.query(query, [id], (error, result) => {
-    if (error) {
-      console.log(error);
-      res.status(500).send('Error');
-    } else {
-      const image = result[0].Perfil;
-      res.send({ base64: Buffer.from(image, 'binary').toString('base64') });
-    }
-  });
-};
 
 
 export const getIdUsers = (req, res) => {
@@ -51,7 +80,7 @@ export const getIdUsers = (req, res) => {
   });
 };
 export const getNome = (req, res) => {
-  const q = "SELECT NomeDeUsuario FROM userinfo WHERE id_pessoa = ?";
+  const q = "SELECT NomeDeUsuario, Cidade FROM userinfo WHERE id_pessoa = ?";
   const id = req.params.id;
   db.query(q, [id] ,(err, data) => {
     if (err) return res.json(err);
@@ -81,19 +110,49 @@ export const addPrivateInfo =(req, res)=>{
 
     })
 }
+export const addPedido = (req, res)=>{
+    const q = "INSERT INTO pedidos(`Remitente`,`Receptor`) VALUES(?,?)"
+
+    const  Values =[
+      req.body.Remitente,
+      req.body.Receptor
+    ]
+
+    db.query(q, Values, (err) =>{
+        if(err){
+         return res.json(err)
+        }else{
+            return res.status(200).json("Usuario cadastrado com sucesso.");
+        }    
+
+    })
+}
+export const deletepedido = (req, res)=>{
+    const q = "DELETE FROM pedidos WHERE Remitente = ? AND Receptor = ?"
+
+    const  Values =[
+      req.body.Remitente,
+      req.body.Receptor
+    ]
+
+    db.query(q, Values, (err) =>{
+        if(err){
+         return res.json(err)
+        }else{
+
+            return res.status(200).json("Usuario cadastrado com sucesso.");
+        }    
+
+    })
+}
 
 export const addInfo = async (req, res) => {
   try {
-    // const imagePath = 'file:///C:/Users/cairo/Desktop/Capture.PNG';
-    // const imageContent = await FileSystem.readAsStringAsync(imagePath, { encoding: FileSystem.EncodingType.Base64 });
-
-
-    const sql = "INSERT INTO userinfo (`id_pessoa`, `NomeDeUsuario`, `Cidade`,`Perfil`, `DataDeNascimento`) VALUES (?, ?, ?, ?, ?)";
+    const sql = "INSERT INTO userinfo (`id_pessoa`, `NomeDeUsuario`, `Cidade`, `DataDeNascimento`) VALUES (?, ?, ?, ?)";
     const values = [
       req.body.id_pessoa,
       req.body.NomeDeUsuario,
       req.body.Cidade,
-      req.body.imagem,
       req.body.DataDeNascimento,
     ];
     db.query(sql, values, (err, result) => {

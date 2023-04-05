@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import {Text, View, StatusBar, TextInput, TouchableOpacity } from 'react-native';
 import { styles } from './styles';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Load from './styles';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation} from '@react-navigation/native'
 import * as Animatable from 'react-native-animatable'

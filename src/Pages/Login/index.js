@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {Text, View, StatusBar, TextInput, TouchableOpacity,ActivityIndicator } from 'react-native';
+import {Text, View, StatusBar, TextInput,Alert, TouchableOpacity,ActivityIndicator } from 'react-native';
 import { styles } from './styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Animatable from 'react-native-animatable'
@@ -7,7 +7,7 @@ import { useNavigation} from '@react-navigation/native'
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios'
 import porta from '../../../Api/Porta.json'
-import { useFonts, Roboto_700Bold_Italic,Roboto_700Bold,Roboto_100Thin } from '@expo-google-fonts/roboto';
+import firebase from '../../../Api/Config'
 export default function Login({onLoginSuccess}) {
     const portaatual = [...porta]
     const navigation = useNavigation();
@@ -18,51 +18,34 @@ export default function Login({onLoginSuccess}) {
     function handlecadastro(){
         navigation.navigate('SignIn')
     }
-    let [fontsLoaded] = useFonts({
-        Roboto_700Bold_Italic,
-        Roboto_700Bold,
-        Roboto_100Thin
-    });
-    
-    if (!fontsLoaded) {
-        return null;
-    }
     const handelLogin = async () =>{
-        // AsyncStorage.getItem('ChatClass').then((value)=>{
-        //     // const Values = JSON.parse(value)
-        //     console.log(value)
-        // })
-        // AsyncStorage.removeItem('ChatClass').then(()=>{
-        //     console.log('chave apagada')
-        // })
-        // let Values = [
-        //     {
-        //         email: userEmail,
-        //         senha: userSenha,
-        //     }
-        // ]
-        // Values.push({id:1})
-        setLoading(true);
-        // AsyncStorage.setItem('ChatClass','2').then(()=>{
-        //     onLoginSuccess();
-        // })
-        // alert('salvos')
-        try {
+        if(userEmail==='' || userSenha===''){
+            Alert.alert('Erro', 'Preecha todos os campos')
+        }else{
+            setLoading(true);
+            try {
                 const response = await axios.post( `${portaatual[0].porta}/verify`, {
                     Email: userEmail,
                     Senha: userSenha
                 });
-                setLoading(false);
                 const id = response.data[0].id;
-                AsyncStorage.setItem('ChatClass',id.toString()).then(()=>{
+                const filename = `${id}.perfil`;
+                const storageRef = firebase.storage().ref().child(filename);
+                await storageRef.getDownloadURL().then(url => {
+                    AsyncStorage.setItem('Imagem', url.toString())
+                }).catch(error => {
+                    console.error('Erro ao obter URL de download da imagem:', error);
+                });
+                setLoading(false);
+                await AsyncStorage.setItem('ChatClass',id.toString()).then(()=>{
                     onLoginSuccess();
                 })
             }
             catch {
                 alert('Erro ao verificar');
                 setLoading(false);
+            }
         }
-          
     }
 
     return (

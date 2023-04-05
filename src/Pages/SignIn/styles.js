@@ -1,17 +1,4 @@
-import { useFonts, Roboto_700Bold ,Roboto_900Black} from '@expo-google-fonts/roboto';
-import { AppLoading } from 'react-native'
 import { StyleSheet } from 'react-native';
-export default function Load (){
-  let [fontsLoaded] = useFonts({
-    Roboto_700Bold,
-    Roboto_100Thin,
-    Roboto_900Black,
-  });
-  
-  if (!Load) {
-    return <AppLoading />;
-  }
-}
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -28,13 +15,13 @@ export const styles = StyleSheet.create({
     flexDirection:'row'
   },
   text: {
-    fontFamily: 'Roboto_700Bold',
+    fontFamily: 'roboto-bold',
     fontSize:40
   },
   Login:{
     marginTop:10,
     fontSize:18,
-    fontFamily:'Roboto_700Bold',
+    fontFamily:'roboto-bold',
   },
   InputContainer:{
     width:'90%',
@@ -55,7 +42,7 @@ export const styles = StyleSheet.create({
   },
   inputtext:{
     fontSize:18,
-    fontFamily:'Roboto_700Bold',
+    fontFamily:'roboto-bold',
     marginBottom:5
   },
   pass:{
@@ -75,7 +62,7 @@ export const styles = StyleSheet.create({
   },
   logintext:{
     color:'#fff',
-    fontFamily:'Roboto_700Bold',
+    fontFamily:'roboto-bold',
     fontSize:18
   },
   eyes:{
