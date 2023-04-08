@@ -40,10 +40,22 @@ export default function Stettings({onLoginOut}):JSX.Element{
   }, []);
   
   if (loading) {
-    return <ActivityIndicator />;
+    return(
+      <View style={{justifyContent:'center', alignItems:'center', flex:1, width:'10%'}}>
+        <ActivityIndicator size={35} color='#007fff'/>
+      </View>
+    )
   }
   
-  function Sair(){
+  async function Sair(){
+    const dados = await AsyncStorage.getItem('ChatClass');
+    try {
+      await axios.put(`${portaatual[0].porta}/visto/${dados}`);
+      await axios.put(`${portaatual[0].porta}/inactive/${dados}`)
+      console.log(`usuario com o ID ${dados} esta offline`);
+    } catch (error) {
+      console.log(`Erro ao atualizar status do usuário com ID ${dados}:`, error);
+    }
     AsyncStorage.removeItem('Imagem')
     AsyncStorage.removeItem('ChatClass')
     onLoginOut();

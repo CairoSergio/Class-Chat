@@ -16,6 +16,27 @@ container: {
     width:'95%',
     padding:8
   },
+  fotodeperfil:{
+    height:65, 
+    width:65,
+    alignItems:"center",
+    justifyContent:'center',
+    borderRadius:100, 
+    overflow:'hidden', 
+    backgroundColor:'#f50'
+  },
+  username:{
+      fontFamily:'roboto-bold', 
+      fontSize:10, 
+      marginTop:8
+  },
+  userinfo:{
+    justifyContent:'center',
+    alignItems:'center',
+    display:'flex',
+    flexDirection:'column',
+    width:100, 
+  },
   optionview:{
     backgroundColor:'#e6e6e6',
     borderColor:'#7a7a7a99',

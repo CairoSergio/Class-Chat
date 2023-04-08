@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {Text, View, StatusBar, TextInput,Alert, TouchableOpacity,ActivityIndicator } from 'react-native';
+import {Text, View, StatusBar, TextInput,Alert, TouchableOpacity,ActivityIndicator, Modal } from 'react-native';
 import { styles } from './styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Animatable from 'react-native-animatable'
@@ -19,8 +19,10 @@ export default function Login({onLoginSuccess}) {
         navigation.navigate('SignIn')
     }
     const handelLogin = async () =>{
+        setLoading(true)
         if(userEmail==='' || userSenha===''){
             Alert.alert('Erro', 'Preecha todos os campos')
+            setLoading(false)
         }else{
             setLoading(true);
             try {
@@ -50,6 +52,14 @@ export default function Login({onLoginSuccess}) {
 
     return (
         <View style={styles.container}>
+        <Modal transparent visible={loading} style={{justifyContent:'center',flex:1, alignItems:'center'}}>
+            <View style={{width:'100%',height:'100%',justifyContent:'center', alignItems:'center'}}>
+                <View style={{padding:30,borderRadius:10,justifyContent:'center', alignItems:'center', backgroundColor:'#fff', elevation:15, width:"80%"}}>
+                    <ActivityIndicator size={40} color="#007fff"/>
+                    <Text style={{fontFamily:'roboto-bold',marginTop:25}}>Aguarde.....</Text>
+                </View>
+            </View>
+        </Modal>
             <View style={styles.titlecontainer}>
                 <View style={styles.title}>
                     <Animatable.Text delay={900} animation={'fadeInLeft'} style={styles.text}>Chat</Animatable.Text>
