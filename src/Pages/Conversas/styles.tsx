@@ -1,0 +1,57 @@
+import { StyleSheet } from 'react-native'
+
+export const styles = StyleSheet.create({
+    messagebox:{
+        position:'absolute',
+        width:'100%',
+        alignItems:'flex-start',
+        backgroundColor:'#f2f2f2',
+        minHeight:70,
+        bottom:0,
+        paddingTop:8,
+    },
+    input:{
+        width:'80%',
+        minHeight:42,
+        maxHeight:350,
+        elevation:10, 
+        padding:15,
+        backgroundColor:'#fff',
+        borderRadius:15
+    },
+    send:{
+        height:55,
+        width:55, 
+        marginLeft:10,
+        backgroundColor:'#007fff',
+        borderRadius:30,
+        justifyContent:'center',
+        alignItems:'center'
+    },
+    minhamensagem:{
+        padding:10,
+        marginTop:10,
+        marginBottom:10,
+        maxWidth:'85%',
+        borderRadius:10,
+        elevation:10,
+        alignSelf:'flex-end',
+        backgroundColor:'#007fff',
+    },
+    remitentemensagem:{
+        padding:10,
+        maxWidth:'85%',
+        borderRadius:10,
+        elevation:10,
+        alignSelf:'flex-start',
+        backgroundColor:'#fff'
+    },
+    meutext:{
+        color:'#fff',
+        fontFamily:'roboto-regular'
+    },
+    remitentetext:{
+        color:'#000',
+        fontFamily:'roboto-regular'
+    }
+})

@@ -4,8 +4,6 @@ import fs from 'fs'
 export const getUsers = (_, res) =>{
   const q = "SELECT * FROM userprivateinfo"
 
-
-
   db.query(q, (err, data)=>{
       if(err) return res.json(err);
 
@@ -73,8 +71,15 @@ export const inactiveUser = (req,res) =>{
     if(err) return res.json(err)
     return res.status(200).json("Estado atualizado");
   })
-
 }
+export const setvisto = (req,res) =>{
+  const q = "UPDATE mensagens SET `visto` = 'sim' WHERE `Receptor` = ? AND `Remitente` = ?"
+  db.query(q,[req.params.receptor, req.params.remitente], (err)=>{
+    if(err) return res.json(err)
+    return res.status(200).json("Estado atualizado");
+  })
+}
+
 export const VistoPorUltimo = (req,res) =>{
   const q = "UPDATE userinfo SET `VistoPorUltimo` = ? WHERE `id_pessoa` = ?"
   let agora = new Date();
@@ -127,8 +132,8 @@ export const getRecebidos = (req, res) => {
       }
 
       const promises = data.map(async (element) => {
-        const [{ id_pessoa, NomeDeUsuario, Cidade, DataDeNascimento }] = await getUserEnviado(element.Remitente);
-        return { id_pessoa, NomeDeUsuario, Cidade, DataDeNascimento };
+        const [{ id_pessoa, NomeDeUsuario, Cidade, DataDeNascimento, status, VistoPorUltimo }] = await getUserEnviado(element.Remitente);
+        return { id_pessoa, NomeDeUsuario, Cidade, DataDeNascimento, status, VistoPorUltimo };
       });
 
       const results = await Promise.all(promises);
@@ -168,6 +173,62 @@ export const verify = (req, res) =>{
 
       return res.status(200).json(data)
   })
+}
+export const getMensagens = (req, res) => {
+  const query = "SELECT * FROM mensagens WHERE Remitente = ? AND Receptor = ? OR  Receptor = ? AND Remitente = ?;";
+  db.query(query, [req.params.remitente, req.params.receptor, req.params.remitente, req.params.receptor], (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+    
+    return res.status(200).json(data);
+  });
+}
+export const getMensagensnaovistas = (req, res) => {
+  const query = "SELECT count(visto) AS todos FROM mensagens WHERE visto='nao' AND Receptor = ? AND Remitente = ?";
+  db.query(query, [req.params.receptor, req.params.remitente], (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+    
+    return res.status(200).json(data);
+  });
+}
+
+export const getconversas = (req, res) => {
+  const q = `
+  SELECT DISTINCT 
+    CASE
+        WHEN Remitente = ? THEN Receptor
+        ELSE Remitente
+    END AS id_pessoa
+  FROM mensagens
+  WHERE Remitente = ? OR Receptor = ?
+`;
+  db.query(q, [req.params.id, req.params.id, req.params.id], async (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Erro ao consultar o banco de dados." });
+    }
+    try {
+      if (data.length === 0) {
+        return res.status(200).json([]);
+      }
+
+      const promises = data.map(async (element) => {
+        const [{ id_pessoa, NomeDeUsuario, Cidade, DataDeNascimento, status, VistoPorUltimo }] = await getUserEnviado(element.id_pessoa);
+        return { id_pessoa, NomeDeUsuario, Cidade, DataDeNascimento, status, VistoPorUltimo };
+      });
+
+      const results = await Promise.all(promises);
+      res.status(200).json(results);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Erro ao consultar o banco de dados." });
+    }
+  });
 }
 
 
@@ -212,6 +273,24 @@ export const addPrivateInfo =(req, res)=>{
         }    
 
     })
+}
+export const addMessagem =(req, res)=>{
+  const q = "INSERT INTO mensagens (`Remitente`, `Receptor`, `Menssangem`, `Data`, `visto`) VALUES(?, ? ,? ,?,?)"
+  const visto = 'nao'
+  const  Values =[
+    req.body.Remitente,
+    req.body.Receptor,
+    req.body.Menssagem,
+    req.body.Data,
+    visto,
+  ]
+  db.query(q, Values, (err) =>{
+    if(err){
+      return res.json(err)
+    }else{
+      return res.status(200).json("Usuario cadastrado com sucesso.");
+    }    
+  })
 }
 export const addPedido = (req, res)=>{
     const q = "INSERT INTO pedidos(`Remitente`,`Receptor`) VALUES(?,?)"

@@ -2,27 +2,23 @@ import React,{useEffect, useState} from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import {BackHandler, Alert } from 'react-native'
-import { useFonts, Roboto_700Bold } from '@expo-google-fonts/roboto';
 import { Text, View } from 'react-native';
-import Chats from '../Pages/Chats';
 import Home from '../Pages/Home';
 import Settings from '../Pages/Settings';
-import Account from '../Pages/acount';
 import Notifications from '../Pages/Notifications';
 import endereco from '../../Api/Porta.json'
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createNativeStackNavigator  } from "@react-navigation/native-stack";
 import Conversas from "../Pages/Conversas";
 import Pesquisar from "../Pages/Pesquisa";
-
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 
-
 export default function Routes({ onLoginOut }) {
   const [currentId, setCurrentId] = useState<string>();
+  const [visibilidade, setvisibilidade] = useState<boolean>(true);
 
   const getId = async () => {
     try {
@@ -62,21 +58,26 @@ export default function Routes({ onLoginOut }) {
     return true;
   };
   
-  const fetchData = async () => {
-    await getId();
-  };
   
   useEffect(() => {
     fetchData();
     const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
     return () => backHandler.remove();
   }, []);
+  const fetchData = async () => {
+    await getId();
+  };
   
   useEffect(() => {
     console.log(`currentId atualizado paraaaaaaa ${currentId}`);
   }, [currentId]);
-  
-
+  const Changevisibility = () =>{
+    setvisibilidade(false)
+  }
+  const Showvisibility = () =>{
+    setvisibilidade(true)
+  }
+  const exibicao = visibilidade ? 'flex' : 'none';
   return (
     <Tab.Navigator
     screenOptions={{
@@ -92,6 +93,7 @@ export default function Routes({ onLoginOut }) {
           backgroundColor: '#D9D9D9',
           bottom: 0,
           height:70,
+          display: exibicao,
           paddingLeft:10,
           paddingRight:10
         },
@@ -121,8 +123,14 @@ export default function Routes({ onLoginOut }) {
       {() => (
         <Stack.Navigator>
           <Stack.Screen name="Inicio" component={Home}/>
-          <Stack.Screen name="Conversas" component={Conversas}         
-          />
+          <Stack.Screen
+            name="Conversas"
+            options={{
+              headerBackVisible:false
+            }}
+          >
+            {(props)=> <Conversas {...props} showbar={Showvisibility} hidebar={Changevisibility}/> }
+          </Stack.Screen>
           <Stack.Screen name="Pesquisar" component={Pesquisar}/>
         </Stack.Navigator>
       )}
@@ -131,6 +139,7 @@ export default function Routes({ onLoginOut }) {
         name="Notificatios"
         component={Notifications}
         options={{
+          tabBarHideOnKeyboard:true,
           headerTitleStyle: {
             fontFamily: 'roboto-bold',
           },

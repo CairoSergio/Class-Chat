@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Component } from 'react';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
 import { ScrollView, Text,RefreshControl, View, Image, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { styles } from './styles';
 import endereco from '../../../Api/Porta.json'
@@ -6,21 +6,35 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import firebase from 'firebase/compat'; '../../../Api/Config'
 import { Ionicons } from '@expo/vector-icons'
+import { useNavigation } from '@react-navigation/native'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 type amigos = {
   id_pessoa: string,
   NomeDeUsuario: string,
   VistoPorUltimo: string,
-  status: string
+  status: string,
+  fotodeperfil: string,
 }
-export default function Amigos({navigation}) {
+type RootStackParamList = {
+  Tela1: undefined
+  Conversas: { nome: string, foto: string,  visualizacao: string, id: string , meuid: string}
+}
+type ConversasNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Conversas'>
+
+export default function Amigos() {
   const [ Amigos, setAmigos ] = useState<amigos[]>([])
   const [ currentId, setcurrentId] = useState<string>()
   const [userimages, setUserImages] = useState<Record<string, string>>({});
   const[ loading, setLoading] = useState<boolean>(true)
   const[ online, setOnline] = useState<boolean>(false)
   const [refreshing, setRefreshing] = useState(false);
+  const navigation = useNavigation<ConversasNavigationProp>()
 
+  const Conversar = (nome:string, foto:string, visualizacao: string, id:string) =>{
+    const dadso = 'Cairo ndava'
+    navigation.navigate('Conversas', {nome: nome, foto:foto, visualizacao: visualizacao, id: id, meuid:currentId})
+  }
   AsyncStorage.getItem('ChatClass').then((values)=>{
     setcurrentId(values)
   })
@@ -80,20 +94,20 @@ export default function Amigos({navigation}) {
       loadUserImages()
     }
   },[])
-
   useEffect(() => {
     async function Load(){
       const data = new Date();
       try {
         const response = await axios.put(`${endereco[0].porta}/active/${currentId}`);
         const re =await  axios.put(`${endereco[0].porta}/visto/${currentId}`);
-        if(Amigos){
-          const respose  = await axios.get(`${endereco[0].porta}/amigos/${currentId}`)
-          setAmigos(respose.data)
-        }
+        loadUserImages()
       }catch(err){
         console.log(err)
       }
+    }
+    if(Amigos.length < 0){
+      const intervalId = setInterval(fetchData, 1000)
+      return () => clearInterval(intervalId);
     }
     const intervalId = setInterval(Load, 10000)
     return () => clearInterval(intervalId);
@@ -131,7 +145,17 @@ export default function Amigos({navigation}) {
                       <Text style={{marginLeft:10, fontSize:12,fontFamily:'roboto-bold', color:'#007fff'}}>Online</Text>
                     ) : (
                       <Text style={{marginLeft:10, fontSize:12, marginTop:6,fontFamily:'noto-bold'}}>
-                        <Text style={{fontFamily:'noto'}}>Visto por ultimno: </Text>
+                        {
+                          new Date(user.VistoPorUltimo).getDate() == new Date().getDate() - 1 ? (
+                            <Text style={{fontFamily:'noto'}}>Visto por ultimo ontem às: </Text>
+                            ) : (new Date(user.VistoPorUltimo).getDate() == new Date().getDate())?(
+                              <Text style={{fontFamily:'noto'}}>Visto por ultimo hoje às: </Text>
+                              ) :(
+                            <Text style={{fontFamily:'noto'}}>Visto por ultimo em {new Date(user.VistoPorUltimo).getDate()}/
+                            {(new Date(user.VistoPorUltimo).getMonth() + 1).toString().padStart(2, '0')}/
+                            {new Date(user.VistoPorUltimo).getFullYear().toString().slice(-2)} às: </Text>
+                          )
+                        }
                         {new Date(user.VistoPorUltimo).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}).slice(0, -3)}
                       </Text>
                     )
@@ -139,7 +163,9 @@ export default function Amigos({navigation}) {
 
                 </View>
             </View>
-            <TouchableOpacity onPress={()=> navigation.navigate('Conversas')} style={{width:40, justifyContent:'center',alignItems:"center",height:40, backgroundColor:"#007fff", borderRadius:10}}>
+            <TouchableOpacity 
+              onPress={() => Conversar(user.NomeDeUsuario, userimages[user.id_pessoa], user.status === 'online' ? 'online' : user.VistoPorUltimo, user.id_pessoa)}
+              style={{width:40, justifyContent:'center',alignItems:"center",height:40, backgroundColor:"#007fff", borderRadius:10}}>
               <Ionicons name='chatbox-ellipses' size={20} color='#fff'/>
             </TouchableOpacity>
           </View>

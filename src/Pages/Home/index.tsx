@@ -105,7 +105,6 @@ export default function Home({ navigation }) {
     const fetchData = async () => {
       await Promise.all([getid(), updateStatus(currentid)]);
     };
-    console.log('online')
     useEffect(() => {
       fetchData();
       if (currentid===''){

@@ -104,11 +104,7 @@ export default function Login({onLoginSuccess}) {
                     </TouchableOpacity>
                 </View>
                 <TouchableOpacity style={styles.login} onPress={handelLogin}>
-                    {loading ? (
-                        <ActivityIndicator color="#fff" size={26}/>
-                    ) : (
-                        <Text style={styles.logintext}>LOGIN</Text>
-                    )}
+                    <Text style={styles.logintext}>LOGIN</Text>
                 </TouchableOpacity>
                 <View style={[styles.pass, { top:'13%'} ]}>
                     <TouchableOpacity
